@@ -170,4 +170,3 @@ Ensure you have run go mod tidy after cloning the repository to download all nec
 
 - Explore the traces in the **SigNoz UI** under the *Traces* tab.  
 - Check out the *Metrics* and *Logs* dashboards.  
-- Extend the example by adding more services and spans.
