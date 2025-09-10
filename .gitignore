@@ -1,0 +1,26 @@
+# Compiled Object files, builds, and executables
+*.o
+*.a
+*.so
+*.exe
+*.test
+*.out
+
+# Local build artifacts
+bin/
+
+# Dependency directory
+vendor/
+
+# IDE and editor directories
+.vscode/
+
+# Environment files (often contain secrets)
+.env*
+
+# Log files
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
