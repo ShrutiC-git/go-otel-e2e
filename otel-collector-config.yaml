@@ -1,0 +1,41 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  batch:
+
+exporters:
+  otlphttp:
+    # Replace <SIGNOZ_REGION> with your SigNoz Cloud region (e.g., us, eu, in)
+    endpoint: ingest.<SIGNOZ_REGION>.signoz.cloud:443
+    tls:
+      insecure: false
+    headers:
+      # Replace <YOUR_SIGNOZ_INGESTION_KEY> with the key from the SigNoz Cloud UI.
+      signoz-ingestion-key: "<YOUR_SIGNOZ_INGESTION_KEY>"
+
+service:
+  extensions: [health_check, pprof, zpages]
+  telemetry:
+    logs:
+      level: debug
+      encoding: console
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp, debug]
