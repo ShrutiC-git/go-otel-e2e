@@ -62,7 +62,7 @@ This will download all dependencies required to run the application.
 
 ### 3. Prepare the OpenTelemetry Collector Config File
 
-1. Copy the provided [`otel-collector-config.yaml`](/otel-collector-config.yaml) into the same folder as the OpenTelemetry Collector binary.  
+1. Copy the provided [`config.yaml`](/config.yaml) into the same folder as the OpenTelemetry Collector binary.  
 2. Open `config.yaml` in a text editor.  
 3. Update the following fields to point to your SigNoz Cloud account:
 
