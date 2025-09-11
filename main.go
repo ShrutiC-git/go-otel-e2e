@@ -1,22 +1,49 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
 	"app/routes"
 	"app/tracing"
 )
 
 func main() {
-	// Initializing OpenTel Tracer
+	// Initialize OpenTelemetry providers (traces + metrics)
 	shutdown := tracing.InitTracer()
 	defer shutdown()
 
 	router := routes.SetupRoutes()
 
-	fmt.Println("Server is running on port 8080")
-	// The router now has instrumentation applied at the route level.
-	log.Fatal(http.ListenAndServe(":8080", router))
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	// Start server in a goroutine.
+	go func() {
+		fmt.Println("Server is running on port 8080")
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("HTTP server error: %v", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shut down the server.
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("Server forced to shutdown: %v", err)
+	}
+
+	// Allow deferred OTel shutdown to run and flush spans/metrics.
 }

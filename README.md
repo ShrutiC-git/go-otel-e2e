@@ -105,12 +105,12 @@ go run main.go
 
 The service will start on port `8080` and expose two sample endpoints:  
 
-- `http://localhost:8080/createOrder`  
-- `http://localhost:8080/checkInventory`  
+- `POST http://localhost:8080/createOrder`  
+- `GET  http://localhost:8080/checkInventory`  
 
 #### Test the order endpoint:
 ```bash
-curl http://localhost:8080/createOrder
+curl -X POST http://localhost:8080/createOrder
 ```
 
 #### Test the inventory endpoint:

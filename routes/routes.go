@@ -14,7 +14,7 @@ func SetupRoutes() *http.ServeMux {
 
 	// Wrap each handler with otelhttp.NewHandler to create a distinct span for each route.
 	// The second argument to NewHandler sets the span name.
-	createOrderHandler := otelhttp.NewHandler(http.HandlerFunc(handlers.CreateOrderHandler), "GET /createOrder")
+    createOrderHandler := otelhttp.NewHandler(http.HandlerFunc(handlers.CreateOrderHandler), "POST /createOrder")
 	router.Handle("/createOrder", createOrderHandler)
 
 	checkInventoryHandler := otelhttp.NewHandler(http.HandlerFunc(handlers.CheckInventoryHandler), "GET /checkInventory")

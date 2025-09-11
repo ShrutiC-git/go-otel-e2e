@@ -3,9 +3,16 @@ receivers:
     protocols:
       http:
         endpoint: "0.0.0.0:4318"
+  # Reads local JSON log files and ships them as OTLP logs.
+  filelog:
+    include: ["${env:APP_LOG_PATH}"]
+    start_at: beginning
+    operators:
+      - type: json_parser
+        parse_from: body
 
 processors:
-  batch:
+  batch: {}
 
 exporters:
   otlphttp:
@@ -16,6 +23,15 @@ exporters:
     headers:
       # Replace <YOUR_SIGNOZ_INGESTION_KEY> with the key from the SigNoz Cloud UI.
       signoz-ingestion-key: "<YOUR_SIGNOZ_INGESTION_KEY>"
+  debug:
+    verbosity: normal
+
+extensions:
+  health_check: {}
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
 
 service:
   extensions: [health_check, pprof, zpages]
@@ -28,14 +44,14 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, debug]
+      exporters: [otlphttp, debug]
 
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, debug]
+      exporters: [otlphttp, debug]
 
     logs:
-      receivers: [otlp]
+      receivers: [otlp, filelog]
       processors: [batch]
-      exporters: [otlp, debug]
+      exporters: [otlphttp, debug]

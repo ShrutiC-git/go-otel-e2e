@@ -18,7 +18,7 @@ type InventoryResponse struct {
 }
 
 func CheckInventoryHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+    ctx := r.Context()
 
 	delay := rand.IntN(601) + 200
 
@@ -31,12 +31,14 @@ func CheckInventoryHandler(w http.ResponseWriter, r *http.Request) {
 		DelayMS: delay,
 	}
 
-	// Add structured log with the simulated delay.
-	logging.DefaultLogger.Info(ctx, "Inventory checked successfully", attribute.Int("inventory.check.delay_ms", delay))
+    // Add structured logs with the simulated delay.
+    logging.DefaultLogger.Info(ctx, "Inventory checked successfully", attribute.Int("inventory.check.delay_ms", delay))
+    logging.JSONLogger.Info(ctx, "Inventory checked successfully", attribute.Int("inventory.check.delay_ms", delay))
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		logging.DefaultLogger.Error(ctx, "Error encoding inventory response", attribute.String("error.reason", err.Error()))
-	}
+    w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(resp); err != nil {
+        logging.DefaultLogger.Error(ctx, "Error encoding inventory response", attribute.String("error.reason", err.Error()))
+        logging.JSONLogger.Error(ctx, "Error encoding inventory response", attribute.String("error.reason", err.Error()))
+    }
 
 }
