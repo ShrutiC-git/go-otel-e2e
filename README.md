@@ -1,6 +1,6 @@
-# 🚀 End-to-End Observability in Go with OTel and SigNoz
+# End-to-End Observability in Go with OTel and SigNoz
 
-- [🚀 End-to-End Observability in Go with OTel and SigNoz](#-end-to-end-observability-in-go-with-otel-and-signoz)
+- [End-to-End Observability in Go with OTel and SigNoz](#-end-to-end-observability-in-go-with-otel-and-signoz)
   - [Prerequisites](#prerequisites)
   - [Setup Instructions](#setup-instructions)
     - [1. Clone the repository](#1-clone-the-repository)
