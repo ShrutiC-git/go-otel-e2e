@@ -120,6 +120,19 @@ curl http://localhost:8080/checkInventory
 
 > Once the OpenTelemetry Collector is running, all requests to these endpoints will be recorded, and the traces, metrics, and logs will be visible in **SigNoz Cloud**.
 
+### 6. (Optional) Generate Traffic (Bash)
+
+To light up traces/metrics in SigNoz, run a tiny bash loop:
+
+```bash
+# 60 requests over ~60s (low and steady)
+for i in {1..60}; do
+  curl -s -o /dev/null -w "%{http_code}\n" -X POST http://localhost:8080/createOrder
+  curl -s -o /dev/null -w "%{http_code}\n"        http://localhost:8080/checkInventory
+  sleep 1
+done
+```
+
 ---
 
 ## Architecture Overview
