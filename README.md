@@ -149,7 +149,7 @@ Alternatively, you can also check `Windows Service` to check the `OTel Collector
 
 #### Is the Collector Configured Correctly?
 
-Verify that your `config.yaml` file contains the correct endpoint and signoz-ingestion-key for your SigNoz Cloud account. A simple typo in the ingestion key can prevent data from being ingested. Check `Windows Application Logs` if issues persist.
+Verify that your `config.yaml` file contains the correct `endpoint` and `signoz-ingestion-key` for your SigNoz Cloud account. A simple typo in the ingestion key can prevent data from being ingested. Check `Windows Application Logs` if issues persist.
 
 #### Is the Go App Connecting to the Collector?
 
