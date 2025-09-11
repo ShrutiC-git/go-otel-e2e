@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	// Initialize OpenTelemetry providers (traces + metrics)
+	// Initialize OpenTelemetry (traces and metrics).
 	shutdown := tracing.InitTracer()
 	defer shutdown()
 
@@ -25,7 +25,7 @@ func main() {
 		Handler: router,
 	}
 
-	// Start server in a goroutine.
+	// Start the server in a goroutine.
 	go func() {
 		fmt.Println("Server is running on port 8080")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -33,7 +33,7 @@ func main() {
 		}
 	}()
 
-	// Wait for interrupt signal to gracefully shut down the server.
+	// Wait for interrupt signal and perform graceful shutdown.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
@@ -44,6 +44,4 @@ func main() {
 	if err := server.Shutdown(ctx); err != nil {
 		log.Printf("Server forced to shutdown: %v", err)
 	}
-
-	// Allow deferred OTel shutdown to run and flush spans/metrics.
 }

@@ -19,8 +19,8 @@ import (
 )
 
 type OrderResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
+    Status  string `json:"status"`
+    Message string `json:"message"`
 }
 
 const (
@@ -30,10 +30,10 @@ const (
 )
 
 var (
-	// Get a meter from the global meter provider
-	meter = otel.Meter(instrumentationName)
-	// Create the counter instrument
-	ordersProcessedCounter metric.Int64Counter
+    // Meter from the global meter provider.
+    meter = otel.Meter(instrumentationName)
+    // Counter for processed orders.
+    ordersProcessedCounter metric.Int64Counter
 )
 
 func init() {
@@ -43,32 +43,32 @@ func init() {
 		metric.WithDescription("The total number of orders processed"),
 		metric.WithUnit("{order}"),
 	)
-	if err != nil {
-		// If a critical component like a metric counter fails, the application should not start.
-		log.Fatalf("failed to create orders_processed_total counter: %v", err)
-	}
+    if err != nil {
+        // Fatal: required metric instrument could not be created.
+        log.Fatalf("failed to create orders_processed_total counter: %v", err)
+    }
 }
 
-// CreateOrderHandler with a 10% failure-rate
+// CreateOrderHandler simulates a 10% failure rate.
 func CreateOrderHandler(w http.ResponseWriter, r *http.Request) {
 
-    // 1. Get the current context and a tracer.
-    // This ctx contains the parent span from the otelhttp middleware.
+    // Get the current context and a tracer.
+    // The context contains the parent span from the otelhttp middleware.
     ctx := r.Context()
     tracer := otel.Tracer(instrumentationName)
 
-    // Simulate some initial processing latency (e.g., request validation, business logic).
+    // Simulate initial processing latency (e.g., validation, business logic).
     time.Sleep(time.Duration(rand.IntN(50)+30) * time.Millisecond)
 
     // Decide if this request should fail (10% chance).
     if rand.IntN(10) == 0 {
-        // 50% of failures happen at the database step directly.
+        // Half of failures occur during the database step.
         if rand.IntN(2) == 0 {
             handleDBError(w, r, tracer)
             return
         }
 
-        // Otherwise, DB step succeeds but payment fails next.
+        // Otherwise, the DB step succeeds but payment fails next.
         _, dbSpan := tracer.Start(ctx, "db.insert_order")
         time.Sleep(time.Duration(rand.IntN(100)+50) * time.Millisecond)
         dbSpan.SetStatus(codes.Ok, "order record inserted")
@@ -81,22 +81,22 @@ func CreateOrderHandler(w http.ResponseWriter, r *http.Request) {
 
     // --- Success Path ---
 
-    // 1) Database step succeeds
+    // Database step
     _, dbSpan := tracer.Start(ctx, "db.insert_order")
     time.Sleep(time.Duration(rand.IntN(100)+50) * time.Millisecond) // Simulate DB work
     dbSpan.SetStatus(codes.Ok, "order record inserted")
     dbSpan.End()
 
-    // 2) Payment step succeeds
+    // Payment step
     _, paySpan := tracer.Start(ctx, "payment.process")
     time.Sleep(time.Duration(rand.IntN(80)+40) * time.Millisecond) // Simulate payment work
     paySpan.SetStatus(codes.Ok, "payment processed successfully")
     paySpan.End()
 
-    // Increment the counter with a "success" status attribute AFTER the full workflow.
+    // Increment the counter with a "success" status attribute after the workflow.
     ordersProcessedCounter.Add(ctx, 1, metric.WithAttributes(attribute.String("status", statusSuccess)))
 
-    // Prepare and send response
+    // Prepare and send the response.
     orderID := rand.IntN(1000)
     resp := OrderResponse{
         Status:  "success",
@@ -114,23 +114,23 @@ func CreateOrderHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-// handleDBError simulates a database-related failure. It creates a span for the DB
-// operation, marks it as an error, and then returns a 500 Internal Server Error.
+// handleDBError simulates a database-related failure. It creates a span for the
+// DB operation, marks it as an error, and returns HTTP 500.
 func handleDBError(w http.ResponseWriter, r *http.Request, tracer trace.Tracer) {
     ctx := r.Context()
     dbCtx, dbSpan := tracer.Start(ctx, "db.insert_order")
     defer dbSpan.End()
 
-	// Simulate a short delay for the failed DB attempt.
-	time.Sleep(time.Duration(rand.IntN(40)+10) * time.Millisecond)
+    // Simulate a short delay for the failed DB attempt.
+    time.Sleep(time.Duration(rand.IntN(40)+10) * time.Millisecond)
 
     err := errors.New("simulated database constraint violation")
     handleRequestError(dbCtx, dbSpan, "database operation failed", err, "database")
     http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 }
 
-// handlePaymentError simulates a payment processing failure. It creates a span for the
-// payment operation, marks it as an error, and returns a 500 Internal Server Error.
+// handlePaymentError simulates a payment processing failure. It creates a span for
+// the payment operation, marks it as an error, and returns HTTP 500.
 func handlePaymentError(w http.ResponseWriter, r *http.Request, tracer trace.Tracer) {
     ctx := r.Context()
     paymentCtx, paymentSpan := tracer.Start(ctx, "payment.process")
@@ -141,8 +141,7 @@ func handlePaymentError(w http.ResponseWriter, r *http.Request, tracer trace.Tra
     http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 }
 
-// handleRequestError is a helper function to centralize the logic for instrumenting
-// an error. It logs the error, increments the failure metric, and sets the span status.
+// handleRequestError centralizes error instrumentation: logs, metric, and span status.
 func handleRequestError(ctx context.Context, span trace.Span, message string, err error, stage string) {
     logging.DefaultLogger.Error(ctx, message,
         attribute.String("error.stage", stage),
@@ -155,6 +154,6 @@ func handleRequestError(ctx context.Context, span trace.Span, message string, er
     ordersProcessedCounter.Add(ctx, 1, metric.WithAttributes(attribute.String("status", statusFailure)))
     span.RecordError(err)
     span.SetStatus(codes.Error, message)
-    // Mark the parent span (from the otelhttp middleware) as failed.
+    // Mark the request span (from otelhttp) as failed.
     trace.SpanFromContext(ctx).SetStatus(codes.Error, message)
 }

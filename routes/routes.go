@@ -10,15 +10,15 @@ import (
 
 // SetupRoutes defines all the application's routes and maps them to their corresponding handlers.
 func SetupRoutes() *http.ServeMux {
-	router := http.NewServeMux()
+    router := http.NewServeMux()
 
-	// Wrap each handler with otelhttp.NewHandler to create a distinct span for each route.
-	// The second argument to NewHandler sets the span name.
+    // Wrap each handler with otelhttp.NewHandler to create a distinct span for each route.
+    // The second argument sets the span name.
     createOrderHandler := otelhttp.NewHandler(http.HandlerFunc(handlers.CreateOrderHandler), "POST /createOrder")
-	router.Handle("/createOrder", createOrderHandler)
+    router.Handle("/createOrder", createOrderHandler)
 
-	checkInventoryHandler := otelhttp.NewHandler(http.HandlerFunc(handlers.CheckInventoryHandler), "GET /checkInventory")
-	router.Handle("/checkInventory", checkInventoryHandler)
+    checkInventoryHandler := otelhttp.NewHandler(http.HandlerFunc(handlers.CheckInventoryHandler), "GET /checkInventory")
+    router.Handle("/checkInventory", checkInventoryHandler)
 
-	return router
+    return router
 }
