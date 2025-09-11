@@ -21,7 +21,9 @@
   - [Next Steps](#next-steps)
 
 
-This project demonstrates how to capture **traces, metrics, and logs** from HTTP-based microservices in Go, send them to an **OpenTelemetry Collector running locally**, and visualize them in **SigNoz Cloud**.
+This project demonstrates how to capture **traces, metrics, and logs** from HTTP-based microservices in Go, send them to an **OpenTelemetry Collector running locally**, and visualize them in **SigNoz Cloud**. 
+
+For a deeper dive, visit this [blog post](https://piquant-angelfish-d0a.notion.site/From-Black-Box-to-Clarity-Instrumenting-a-Go-Service-with-OpenTelemetry-and-SigNoz-26ba2418fe7e8052b1ebc43064ca46bb?pvs=74)
 
 ![Go](https://img.shields.io/badge/Go-1.23+-blue?logo=go) 
 ![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-v1.0-purple) 
